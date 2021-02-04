@@ -1,0 +1,58 @@
+    public static void main(String[] args) {
+        String zipPath = "/Users/ccy/Desktop/dcglupdate/dcgl.zip";
+
+        try {
+            String DESedeKey = "MjAyMDA5MjVEY3puQDEyM0RFU2VkZQ==";
+            EncryptDecryptUtil desded = new EncryptDecryptUtil(Base64ConvertUtil.decode(DESedeKey), DESEDE);
+
+            String version = "v3.2.5.5";
+//            File destDir = new File("/Users/ccy/Desktop/dcglupdate/migration/");
+            String upgradeZipName = "dcgl_"+version+".zip";
+            String upgradeZipPath = "/Users/ccy/Desktop/dcglupdate/"+upgradeZipName;
+
+
+//            if (destDir.exists()&&destDir.isDirectory()){
+//                File[] destFiles = destDir.listFiles();
+//                for (File file : destFiles){
+//                    if (file.getName().contains("dcgl-init")){
+//                        desded.encrypt(file.getPath(),
+//                                "/Users/ccy/Desktop/dcglupdate/dcgl/sql/dcgl-init.sql", DESEDE);
+//                    }else{
+//                        desded.encrypt(file.getPath(),
+//                                "/Users/ccy/Desktop/dcglupdate/dcgl/sql/migration/"+file.getName(), DESEDE);
+//                    }
+//                }
+//            }
+            //设置压缩文件参数
+            ZipParameters parameters = new ZipParameters();
+            //设置压缩方法
+            parameters.setCompressionMethod(CompressionMethod.STORE);
+            //设置压缩级别
+            parameters.setCompressionLevel(CompressionLevel.NORMAL);
+            //设置压缩文件是否加密
+            parameters.setEncryptFiles(true);
+            //设置aes加密强度
+            parameters.setAesKeyStrength(AesKeyStrength.KEY_STRENGTH_256);
+            //设置加密方法
+            parameters.setEncryptionMethod(EncryptionMethod.AES);
+            String zipPassword = "dachengguanlan3344upgradec9j+/d&";
+            File file = new File("/Users/ccy/Desktop/dcglupdate/dcgl/");
+            FileUtil.doZip(zipPath, parameters, zipPassword, file);
+            String dcglMd5 = DigestUtils.md5Hex(new FileInputStream("/Users/ccy/Desktop/dcglupdate/dcgl.zip"));
+            System.out.println(dcglMd5);
+            FileUtil.fileLinesWrite("/Users/ccy/Desktop/dcglupdate/md5File",dcglMd5,true);
+            FileUtil.fileLinesWrite("/Users/ccy/Desktop/dcglupdate/version",version,true);
+            File md5File = new File("/Users/ccy/Desktop/dcglupdate/md5File");
+            File versionFile = new File("/Users/ccy/Desktop/dcglupdate/version");
+            File dcglZipFile = new File(zipPath);
+            FileUtil.doZip(upgradeZipPath, parameters, zipPassword, md5File,dcglZipFile,versionFile);
+            md5File.delete();
+            versionFile.delete();
+            dcglZipFile.delete();
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
